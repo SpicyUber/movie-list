@@ -56,10 +56,12 @@ client.on('ready', (msg)=>{loadList("saves/save.json"); client.user.setActivity(
 
 
 function movieInList(movieTitle){
+    console.log("MOVIE TEST"+movieTitle);
+    if(movieTitle!=null){
 for(let i=0;i<movieList.length;i++){
     if(movieList[i].title==movieTitle){return i;}
 }return -1;
-}
+}else return -1;}
 function addMovie(movieTitle,id,msg){
 
 const movie={
@@ -121,12 +123,12 @@ if(pageNumber>0&&pageNumber<=pageLast){for(let i=0+(10*(pageNumber-1));i<movieLi
 msg.reply("\`\`\`"+movieListString+"\n"+"This is page "+pageNumber+" out of "+pageLast+"\`\`\`");}}
 else if(userCommand[1]=="remove"&&userCommand.length>2){removeMovie(msg,userCommand[2]);}
 else if(userCommand[1]=="vote"&&userCommand.length>2){
-if(!isNaN(userCommand[2])){
-voteForMovie(msg,userCommand[2]);}else{let temp=movieInList(movieEntry);console.log("debug "+temp); if(temp!=-1){voteForMovie(msg,temp+1);}else{msg.reply("Movie not found. Make sure the right letters are capitalized.");}}
+if(!isNaN(movieEntry)){
+voteForMovie(msg,userCommand[2]);}else{var votetemp=-1; thisMovieExists(movieEntry).then((result)=>{votetemp = movieInList(result);if(votetemp!=-1){voteForMovie(msg,votetemp+1);}else{msg.reply("Movie not found.");}}); console.log("debug "+votetemp); }
 }else if(userCommand[1]=="help"){msg.reply("**!ml add [Movie Name]**\n*Adds a movie to the list.*\n\n**!ml page [Page Number]**\n*Displays a page of the movie list.*\n\n**!ml remove [Movie Name/ Substring of the movies you want to delete]**\n*Removes a movie from the list. You can only remove movies you've added.*\n\n**!ml vote [Movie Rank Number/Caps Sensitive Movie Name]**\n*Vote for a movie.*\n\n**!ml unvote [Movie Rank Number/Caps Sensitive Movie Name]**\n*Revoke a vote for a movie.*");}
 else if(userCommand[1]=="unvote"&&userCommand.length>2){
-    if(!isNaN(userCommand[2])){
-    unvoteForMovie(msg,userCommand[2]);}else{let temp=movieInList(movieEntry); console.log("debug "+temp); if(temp!=-1){unvoteForMovie(msg,temp+1);}else{msg.reply("Movie not found. Make sure the right letters are capitalized.");}}}
+    if(!isNaN(movieEntry)){
+    unvoteForMovie(msg,userCommand[2]);}else{var unvotetemp=-1; thisMovieExists(movieEntry).then((result)=>{unvotetemp = movieInList(result);if(unvotetemp!=-1){unvoteForMovie(msg,unvotetemp+1);}else{msg.reply("Movie not found.");}}); console.log("debug "+unvotetemp); }}
 else{msg.reply("Invalid command. For the list of commands do: !ml help"); }
 }
     
