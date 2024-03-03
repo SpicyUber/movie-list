@@ -28,6 +28,7 @@ function loadList(saveName){
 }
 
 
+
 async function thisMovieExists(movieName){
     movieName=movieName.replace(' ','+');
    
@@ -97,7 +98,7 @@ function unvoteForMovie(msg,movieRank){
     if(movieList[i].voters.includes(msg.author.id)){movieList[i].votes--; msg.reply("You changed your mind about "+movieList[i].title+"."); for(let j=0;j<movieList[i].voters.length;j++){if(movieList[i].voters[j]==msg.author.id){movieList[i].voters.splice(j,1);}} sortList(); saveList("saves/save.json");}else{msg.reply("You haven't voted for this movie.")}
 }
 
-function removeMovie(msg,movieName){let counter=0;for(let i=0;i<movieList.length;i++){if(movieList[i].addedBy==msg.author.id&&movieList[i].title.toUpperCase().includes(movieName.toUpperCase())){movieList.splice(i,1);counter++;}}msg.reply("Number of movies removed: "+counter );saveList("saves/save.json");}
+function removeMovie(msg,movieName){let counter=0;for(let i=0;i<movieList.length;i++){if(movieList[i].addedBy==msg.author.id&&movieList[i].title.toUpperCase()===movieName.toUpperCase()){movieList.splice(i,1);counter++;break;}}if(counter==1){msg.reply("Movie removed." );}else{msg.reply("Movie not found. (Wrong name or no permission.)");}saveList("saves/save.json");}
 
 client.on('messageCreate',(msg)=>{
    if(msg.content.startsWith('!ml',0)) {
@@ -121,11 +122,11 @@ if(userCommand[1]=="add"&&userCommand.length>2){
 else if(userCommand[1]=="page"&&userCommand.length==2){let movieListString=""; let pageNumber=1; let pageLast=parseInt((movieList.length/10)+1);
 if(pageNumber>0&&pageNumber<=pageLast){for(let i=0+(10*(pageNumber-1));i<movieList.length;i++){if(i>=(10*(pageNumber))){break;}movieListString=movieListString+(i+1)+". "+movieList[i].title.substring(0,59)+" (votes: "+movieList[i].votes+")\n";}
 msg.reply("\`\`\`"+movieListString+"\n"+"This is page "+pageNumber+" out of "+pageLast+"\`\`\`");}}
-else if(userCommand[1]=="remove"&&userCommand.length>2){removeMovie(msg,userCommand[2]);}
+else if(userCommand[1]=="remove"&&userCommand.length>2){removeMovie(msg,movieEntry);}
 else if(userCommand[1]=="vote"&&userCommand.length>2){
 if(!isNaN(movieEntry)){
 voteForMovie(msg,userCommand[2]);}else{var votetemp=-1; thisMovieExists(movieEntry).then((result)=>{votetemp = movieInList(result);if(votetemp!=-1){voteForMovie(msg,votetemp+1);}else{msg.reply("Movie not found.");}}); console.log("debug "+votetemp); }
-}else if(userCommand[1]=="help"){msg.reply("**!ml add [Movie Name]**\n*Adds a movie to the list.*\n\n**!ml page [Page Number]**\n*Displays a page of the movie list.*\n\n**!ml remove [Movie Name/ Substring of the movies you want to delete]**\n*Removes a movie from the list. You can only remove movies you've added.*\n\n**!ml vote [Movie Rank Number/Caps Sensitive Movie Name]**\n*Vote for a movie.*\n\n**!ml unvote [Movie Rank Number/Caps Sensitive Movie Name]**\n*Revoke a vote for a movie.*");}
+}else if(userCommand[1]=="help"){msg.reply("**!ml add [Movie Name]**\n*Adds a movie to the list.*\n\n**!ml page [Page Number]**\n*Displays a page of the movie list.*\n\n**!ml remove [Full Movie Name]**\n*Removes a movie from the list. You can only remove movies you've added.*\n\n**!ml vote [Movie Rank Number/Movie Name]**\n*Vote for a movie.*\n\n**!ml unvote [Movie Rank Number/Movie Name]**\n*Revoke a vote for a movie.*");}
 else if(userCommand[1]=="unvote"&&userCommand.length>2){
     if(!isNaN(movieEntry)){
     unvoteForMovie(msg,userCommand[2]);}else{var unvotetemp=-1; thisMovieExists(movieEntry).then((result)=>{unvotetemp = movieInList(result);if(unvotetemp!=-1){unvoteForMovie(msg,unvotetemp+1);}else{msg.reply("Movie not found.");}}); console.log("debug "+unvotetemp); }}
