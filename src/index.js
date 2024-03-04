@@ -41,12 +41,16 @@ async function getMovieInfo(msg,movieName){
     console.log(response2);
     posterRequestData= await response2.json();
     console.log(movieRequestData);
+    let poster;
+    if(posterRequestData.movie_results[0]==null){
+        poster="";
+    }else{poster=posterRequestData.movie_results[0].poster_path;}
     if(movieRequestData.Response=="True"){const infoMessageEmbed = new EmbedBuilder()
         .setTitle(movieRequestData.Title+' ('+movieRequestData.Year+')')
     .setDescription(movieRequestData.Plot)
     .setURL('https://www.imdb.com/title/'+movieRequestData.imdbID)
-    .setImage('http://image.tmdb.org/t/p/original'+posterRequestData.movie_results[0].poster_path)
-    ;console.log('http://image.tmdb.org/t/p/original'+posterRequestData.movie_results[0].poster_path);
+    .setImage('http://image.tmdb.org/t/p/original'+poster)
+    ;
     msg.reply({embeds:[infoMessageEmbed]});
     }else{msg.reply("This movie does not exist.")};
 }
