@@ -1,8 +1,9 @@
 
-const {Client, IntentsBitField, ActivityType} = require('discord.js');
+const {Client, IntentsBitField, ActivityType, EmbedBuilder} = require('discord.js');
 require('dotenv').config();
 const apiKey=process.env.API_KEY;
 const loginKey=process.env.LOGIN_KEY;
+const apiKey2=process.env.API_KEY_2;
 var movieList=[];
 /*Function used to save changes to the movieList. The list is stored in a json.*/
 function saveList(saveName){
@@ -27,7 +28,28 @@ function loadList(saveName){
     
 }
 
-
+async function getMovieInfo(msg,movieName){
+    movieName=movieName.replace(' ','+');
+   
+    let url="http://www.omdbapi.com/?t="+movieName+"&type=movie&plot=short&apikey="+apiKey;
+    
+    const response = await fetch(url);
+    movieRequestData= await response.json();
+    let url2="https://api.themoviedb.org/3/find/"+movieRequestData.imdbID+"?api_key="+apiKey2+"&external_source=imdb_id";
+    const response2= await fetch(url2);
+    console.log(url2);
+    console.log(response2);
+    posterRequestData= await response2.json();
+    console.log(movieRequestData);
+    if(movieRequestData.Response=="True"){const infoMessageEmbed = new EmbedBuilder()
+        .setTitle(movieRequestData.Title+' ('+movieRequestData.Year+')')
+    .setDescription(movieRequestData.Plot)
+    .setURL('https://www.imdb.com/title/'+movieRequestData.imdbID)
+    .setImage('http://image.tmdb.org/t/p/original'+posterRequestData.movie_results[0].poster_path)
+    ;console.log('http://image.tmdb.org/t/p/original'+posterRequestData.movie_results[0].poster_path);
+    msg.reply({embeds:[infoMessageEmbed]});
+    }else{msg.reply("This movie does not exist.")};
+}
 
 async function thisMovieExists(movieName){
     movieName=movieName.replace(' ','+');
@@ -130,6 +152,7 @@ voteForMovie(msg,userCommand[2]);}else{var votetemp=-1; thisMovieExists(movieEnt
 else if(userCommand[1]=="unvote"&&userCommand.length>2){
     if(!isNaN(movieEntry)){
     unvoteForMovie(msg,userCommand[2]);}else{var unvotetemp=-1; thisMovieExists(movieEntry).then((result)=>{unvotetemp = movieInList(result);if(unvotetemp!=-1){unvoteForMovie(msg,unvotetemp+1);}else{msg.reply("Movie not found.");}}); console.log("debug "+unvotetemp); }}
+else if(userCommand[1]=="info"&&userCommand.length>2){getMovieInfo(msg,movieEntry);}
 else{msg.reply("Invalid command. For the list of commands do: !ml help"); }
 }
     
