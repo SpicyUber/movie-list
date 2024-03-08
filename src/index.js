@@ -28,15 +28,18 @@ function loadList(saveName){
     
 }
 
+
 async function getMovieInfo(msg,movieName){
     movieName=movieName.replace(' ','+');
    
     let url="http://www.omdbapi.com/?t="+movieName+"&type=movie&plot=short&apikey="+apiKey;
     
     const response = await fetch(url);
+    if (response.status==404){msg.reply("This movie does not exist."); return; }
     movieRequestData= await response.json();
     let url2="https://api.themoviedb.org/3/find/"+movieRequestData.imdbID+"?api_key="+apiKey2+"&external_source=imdb_id";
     const response2= await fetch(url2);
+    if (response2.status==404){msg.reply("This movie does not exist."); return;}
     console.log(url2);
     console.log(response2);
     posterRequestData= await response2.json();
@@ -60,9 +63,10 @@ async function thisMovieExists(movieName){
    
     let url="http://www.omdbapi.com/?t="+movieName+"&type=movie&apikey="+apiKey;
     const response = await fetch(url);
-    movieRequestData= await response.json();
-    console.log(movieRequestData);
-    if(movieRequestData.Response=="True"){console.log("the movie is real");return movieRequestData.Title;}else{console.log("not a real movie");return null;};
+    if(response.status==404){movieRequestData=null;}else
+    {movieRequestData= await response.json();}
+    
+    if(movieRequestData!=null&&movieRequestData.Response=="True"){console.log("the movie is real");return movieRequestData.Title;}else{console.log("not a real movie");return null;};
     
 }
 
